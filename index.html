@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Todo List - Supabase + Vercel Demo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>📝 Todo List</h1>
+    <p class="subtitle">Demo: HTML/JS + Supabase + GitHub Actions CI/CD + Vercel</p>
+
+    <form id="todo-form">
+      <input type="text" id="task-input" placeholder="Nhập công việc mới..." required />
+      <button type="submit">Thêm</button>
+    </form>
+
+    <ul id="todo-list"></ul>
+
+    <p id="status" class="status"></p>
+  </div>
+
+  <!-- Supabase JS SDK (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

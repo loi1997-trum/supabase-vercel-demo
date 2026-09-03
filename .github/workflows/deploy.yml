@@ -1,0 +1,34 @@
+name: Deploy to Vercel
+
+# Chạy workflow này mỗi khi có commit push lên nhánh main
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      # 1. Lấy code từ repository về
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Cài đặt Vercel CLI
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # 3. Kéo cấu hình môi trường từ Vercel (dùng token để xác thực)
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      # 4. Build project (với static site bước này gần như là copy/prepare)
+      - name: Build Project Artifacts
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      # 5. Deploy bản build lên Vercel (production)
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
