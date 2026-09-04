@@ -13,6 +13,17 @@ jobs:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
+      # 0. DEBUG TẠM THỜI: kiểm tra độ dài secrets (không lộ giá trị thật)
+      - name: Debug secrets length
+        run: |
+          echo "VERCEL_TOKEN length: ${#VERCEL_TOKEN}"
+          echo "VERCEL_ORG_ID length: ${#VERCEL_ORG_ID}"
+          echo "VERCEL_ORG_ID value (first/last char check): [${VERCEL_ORG_ID:0:5}...${VERCEL_ORG_ID: -5}]"
+          echo "VERCEL_PROJECT_ID length: ${#VERCEL_PROJECT_ID}"
+          echo "VERCEL_PROJECT_ID value (first/last char check): [${VERCEL_PROJECT_ID:0:5}...${VERCEL_PROJECT_ID: -5}]"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
       # 1. Lấy code từ repository về
       - name: Checkout code
         uses: actions/checkout@v4
