@@ -5,7 +5,6 @@ pipeline {
         VERCEL_TOKEN      = credentials('VERCEL_TOKEN')
         TELEGRAM_TOKEN    = credentials('TELEGRAM_TOKEN')
         TELEGRAM_CHAT_ID  = credentials('TELEGRAM_CHAT_ID')
-        VERCEL_ORG_ID     = 'team_LIVWO1DlOTPV3tatbatRcNon'
         VERCEL_PROJECT_ID = 'prj_eLH8KAJtkPpbSWuw9A9XyuMeGahg'
         REPO_NAME         = 'supabase-vercel-demo'
         BRANCH_NAME       = 'main'
@@ -25,17 +24,18 @@ pipeline {
         stage('Deploy to Vercel') {
             steps {
                 script {
-                    // Chạy Node container qua Docker để deploy bằng Vercel CLI
+                    // Dùng node:20-alpine và deploy trực tiếp không cần chỉ định scope
                     sh '''
                         docker run --rm \
                           -v "$(pwd)":/app \
                           -w /app \
                           -e VERCEL_TOKEN="${VERCEL_TOKEN}" \
-                          -e VERCEL_ORG_ID="${VERCEL_ORG_ID}" \
                           -e VERCEL_PROJECT_ID="${VERCEL_PROJECT_ID}" \
-                          node:18-alpine sh -c "
-                            npm install -g vercel &&
-                            DEPLOY_URL=\\$(vercel deploy --prod --yes --token=\\$VERCEL_TOKEN --scope=\\$VERCEL_ORG_ID) &&
+                          node:20-alpine sh -c "
+                            npm install -g vercel@latest &&
+                            vercel pull --yes --environment=production --token=\\$VERCEL_TOKEN &&
+                            vercel build --prod --token=\\$VERCEL_TOKEN &&
+                            DEPLOY_URL=\\$(vercel deploy --prebuilt --prod --token=\\$VERCEL_TOKEN) &&
                             echo \\"WEBSITE_URL=\\${DEPLOY_URL}\\" > /app/deploy_output.env
                           "
                     '''
