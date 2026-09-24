@@ -15,10 +15,10 @@ pipeline {
             steps {
                 script {
                     def commitHash = env.GIT_COMMIT ? env.GIT_COMMIT.take(7) : sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
-                    def message = """🚀 *Bắt đầu deploy website*
-*Repository:* `${env.REPO_NAME}`
-*Branch:* `${env.BRANCH_NAME}`
-*Commit:* `${commitHash}`"""
+                    def message = """🚀 <b>Bắt đầu deploy website</b>
+Repository: ${env.REPO_NAME}
+Branch: ${env.BRANCH_NAME}
+Commit: ${commitHash}"""
                     sendTelegram(message)
                 }
             }
@@ -54,21 +54,21 @@ pipeline {
         success {
             script {
                 def siteUrl = env.DEPLOY_URL ?: "https://supabase-vercel-demo-2.vercel.app"
-                def message = """✅ *Deploy thành công*
-*Repository:* `${env.REPO_NAME}`
-*Branch:* `${env.BRANCH_NAME}`
-*Website:* ${siteUrl}"""
+                def message = """✅ <b>Deploy thành công</b>
+Repository: ${env.REPO_NAME}
+Branch: ${env.BRANCH_NAME}
+Website: ${siteUrl}"""
                 sendTelegram(message)
             }
         }
         failure {
             script {
                 def commitHash = env.GIT_COMMIT ? env.GIT_COMMIT.take(7) : sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
-                def message = """❌ *Deploy thất bại*
-*Repository:* `${env.REPO_NAME}`
-*Branch:* `${env.BRANCH_NAME}`
-*Commit:* `${commitHash}`
-*Error:* Pipeline build failed. Vui lòng kiểm tra Console Output trên Jenkins."""
+                def message = """❌ <b>Deploy thất bại</b>
+Repository: ${env.REPO_NAME}
+Branch: ${env.BRANCH_NAME}
+Commit: ${commitHash}
+Error: Pipeline build failed. Vui lòng kiểm tra Console Output trên Jenkins."""
                 sendTelegram(message)
             }
         }
@@ -76,10 +76,11 @@ pipeline {
 }
 
 def sendTelegram(String message) {
-    sh """
+    writeFile file: 'tg_msg.txt', text: message
+    sh '''
         curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
         -d "chat_id=${TELEGRAM_CHAT_ID}" \
-        -d "parse_mode=Markdown" \
-        --data-urlencode "text=${message}" > /dev/null
-    """
+        -d "parse_mode=HTML" \
+        --data-urlencode "text@tg_msg.txt" > /dev/null
+    '''
 }
