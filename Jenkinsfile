@@ -14,10 +14,10 @@ pipeline {
         stage('Notify Start') {
             steps {
                 script {
-                    def commitHash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    def commitHash = env.GIT_COMMIT ? env.GIT_COMMIT.take(7) : sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
                     def message = """🚀 *Bắt đầu deploy website*
-*Repository:* `${REPO_NAME}`
-*Branch:* `${BRANCH_NAME}`
+*Repository:* `${env.REPO_NAME}`
+*Branch:* `${env.BRANCH_NAME}`
 *Commit:* `${commitHash}`"""
                     sendTelegram(message)
                 }
@@ -55,18 +55,18 @@ pipeline {
             script {
                 def siteUrl = env.DEPLOY_URL ?: "https://supabase-vercel-demo-2.vercel.app"
                 def message = """✅ *Deploy thành công*
-*Repository:* `${REPO_NAME}`
-*Branch:* `${BRANCH_NAME}`
+*Repository:* `${env.REPO_NAME}`
+*Branch:* `${env.BRANCH_NAME}`
 *Website:* ${siteUrl}"""
                 sendTelegram(message)
             }
         }
         failure {
             script {
-                def commitHash = sh(script: "git rev-parse --short HEAD || echo unknown", returnStdout: true).trim()
+                def commitHash = env.GIT_COMMIT ? env.GIT_COMMIT.take(7) : sh(script: "git rev-parse --short HEAD || echo 'unknown'", returnStdout: true).trim()
                 def message = """❌ *Deploy thất bại*
-*Repository:* `${REPO_NAME}`
-*Branch:* `${BRANCH_NAME}`
+*Repository:* `${env.REPO_NAME}`
+*Branch:* `${env.BRANCH_NAME}`
 *Commit:* `${commitHash}`
 *Error:* Pipeline build failed. Vui lòng kiểm tra Console Output trên Jenkins."""
                 sendTelegram(message)
